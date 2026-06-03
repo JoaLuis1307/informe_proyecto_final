@@ -1,0 +1,48 @@
+% !TeX program = pdflatex
+% =============================================================
+% TEMPLATE MODERNO PARA INFORMES DE LABORATORIO ANSYS
+% Compila con: pdflatex -> biber -> pdflatex -> pdflatex
+% =============================================================
+
+\documentclass[11pt,a4paper]{article}
+
+\input{config/packages}
+\input{config/metadata}
+\input{config/styles}
+\input{config/macros}
+
+\addbibresource{referencias.bib}
+
+\begin{document}
+
+\input{frontmatter/portada}
+
+\clearpage
+\pagestyle{plain}
+\tableofcontents
+\thispagestyle{plain}
+
+\clearpage
+\pagestyle{fancy}
+\thispagestyle{fancy}
+
+\input{sections/01_introduccion}
+\input{sections/02_objetivos}
+\input{sections/03_fundamento_teorico}
+\input{sections/04_metodologia_ansys}
+\input{sections/05_resultados}
+\input{sections/06_discusion}
+\input{sections/07_conclusiones}
+
+\clearpage
+\pagestyle{plain}
+\nocite{*}
+\printbibliography[title={Referencias}]
+
+\clearpage
+\pagestyle{fancy}
+\thispagestyle{fancy}
+\appendix
+\input{appendices/anexo_a}
+
+\end{document}

@@ -1,0 +1,33 @@
+\section{DESARROLLO}
+Esta seccion debe explicar paso a paso como se construyo y configuro la simulacion.
+
+\subsection{Creación del modelo}
+Describe la geometria creada o importada en ANSYS. Incluye dimensiones, unidades y simplificaciones realizadas.
+
+\captura[0.62]{figures/captura_placeholder.png}{Ejemplo de captura del modelo en ANSYS. Reemplaza esta imagen por tu captura real.}
+
+\subsection{Configuración de unidades y dimensiones}
+
+\begin{table}[H]
+\centering
+\caption{Parametros principales utilizados en la simulacion.}
+\label{tab:parametros}
+\begin{tabularx}{\linewidth}{>{\bfseries}l X c}
+\toprule
+Parametro & Descripcion & Valor \\
+\midrule
+Material & Material asignado al dominio principal & Cobre / FR4 / Aire \\
+Frecuencia & Rango de barrido configurado & \SI{1}{GHz}--\SI{10}{GHz} \\
+Mallado & Tipo de malla empleada & Adaptativa \\
+Solver & Metodo de solucion seleccionado & Modal / Transient / Static \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Aplicación de simetría}
+Explica las fronteras asignadas, puertos, cargas, restricciones, fuentes o condiciones iniciales.
+
+\subsection{Condiciones de frontera}
+Indica el tipo de analisis realizado, numero de iteraciones, criterios de convergencia, barridos parametricos y configuracion del solver.
+\subsection{Puertos de excitación}
+\subsection{Configuración de simulación}

@@ -1,0 +1,204 @@
+% =============================================================
+% ESTILO VISUAL GENERAL
+% INFORMES DE LABORATORIO ANSYS / TELECOMUNICACIONES
+% =============================================================
+
+% -------------------------------------------------------------
+% PALETA DE COLORES
+% -------------------------------------------------------------
+
+\definecolor{Primary}{HTML}{0E7490}
+\definecolor{PrimaryDark}{HTML}{134E4A}
+
+\definecolor{Accent}{HTML}{ECFEFF}
+\definecolor{SoftGray}{HTML}{F8FAFC}
+
+\definecolor{TextGray}{HTML}{334155}
+\definecolor{RuleGray}{HTML}{CBD5E1}
+\definecolor{MutedGray}{HTML}{64748B}
+
+% -------------------------------------------------------------
+% PDF
+% -------------------------------------------------------------
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=PrimaryDark,
+    citecolor=PrimaryDark,
+    urlcolor=PrimaryDark,
+    pdftitle={\TituloInforme}
+}
+% =============================================================
+% TEXTO GENERAL
+% =============================================================
+
+\onehalfspacing
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.40em}
+
+% =============================================================
+% LISTAS
+% =============================================================
+
+\setlist[itemize]{
+    topsep=3pt,
+    itemsep=2pt,
+    parsep=0pt,
+    partopsep=0pt,
+    leftmargin=1.15cm
+}
+
+\setlist[enumerate]{
+    topsep=3pt,
+    itemsep=2pt,
+    parsep=0pt,
+    partopsep=0pt,
+    leftmargin=1.15cm
+}
+
+% =============================================================
+% TÍTULOS
+% =============================================================
+
+\titleformat{\section}
+{\Large\bfseries\color{Primary}}
+{\thesection.}
+{0.75em}
+{}
+[
+\vspace{0.16em}
+{\color{Primary}\titlerule[0.6pt]}
+]
+
+\titleformat{\subsection}
+{\large\bfseries\color{PrimaryDark}}
+{\thesubsection.}
+{0.60em}
+{}
+
+\titleformat{\subsubsection}
+{\normalsize\bfseries\color{TextGray}}
+{\thesubsubsection.}
+{0.50em}
+{}
+
+\titlespacing*{\section}
+{0pt}
+{1.70em}
+{0.75em}
+
+\titlespacing*{\subsection}
+{0pt}
+{1.00em}
+{0.40em}
+
+\titlespacing*{\subsubsection}
+{0pt}
+{0.70em}
+{0.25em}
+
+% =============================================================
+% ENCABEZADO Y PIE
+% =============================================================
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{\footnotesize\color{MutedGray}\NumeroLaboratorio}
+\fancyhead[R]{\footnotesize\color{MutedGray}\nouppercase{\leftmark}}
+\fancyfoot[C]{\footnotesize\color{MutedGray}\thepage}
+
+\renewcommand{\headrulewidth}{0.35pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\renewcommand{\sectionmark}[1]{%
+    \markboth{\thesection.\ #1}{}
+}
+
+% Mismo encabezado incluso si LaTeX cambia a plain
+\fancypagestyle{fancyplain}{
+    \fancyhf{}
+    \fancyhead[L]{\footnotesize\color{MutedGray}\NumeroLaboratorio}
+    \fancyhead[R]{\footnotesize\color{MutedGray}\nouppercase{\leftmark}}
+    \fancyfoot[C]{\footnotesize\color{MutedGray}\thepage}
+    \renewcommand{\headrulewidth}{0.35pt}
+    \renewcommand{\footrulewidth}{0pt}
+}
+
+% Para índice y páginas sin encabezado
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyfoot[C]{\footnotesize\color{MutedGray}\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0pt}
+}
+
+% =============================================================
+% PORTADA - ÍNDICE - REFERENCIAS
+% =============================================================
+
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyfoot[C]{\footnotesize\color{MutedGray}\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0pt}
+}
+
+% =============================================================
+% FIGURAS
+% =============================================================
+
+\captionsetup{
+    font=small,
+    labelfont={bf,color=PrimaryDark},
+    textfont=it,
+    justification=centering,
+    singlelinecheck=false
+}
+
+% =============================================================
+% TABLAS
+% =============================================================
+
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{7pt}
+
+% =============================================================
+% CAJAS
+% =============================================================
+
+\tcbset{
+    colback=Accent,
+    colframe=Primary,
+    boxrule=0.4pt,
+    arc=1.5mm,
+    left=6pt,
+    right=6pt,
+    top=5pt,
+    bottom=5pt
+}
+
+% =============================================================
+% CÓDIGO
+% =============================================================
+
+\lstdefinestyle{labcode}{
+    backgroundcolor=\color{SoftGray},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{RuleGray},
+    keywordstyle=\bfseries\color{PrimaryDark},
+    commentstyle=\itshape\color{MutedGray},
+    stringstyle=\color{Primary},
+    numbers=left,
+    numberstyle=\tiny\color{MutedGray},
+    xleftmargin=1.3em,
+    framexleftmargin=1.0em,
+    aboveskip=0.6em,
+    belowskip=0.6em
+}
+
+\lstset{style=labcode}
+

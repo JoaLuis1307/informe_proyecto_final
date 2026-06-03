@@ -1,0 +1,13 @@
+% =============================================================
+% MACROS Y BLOQUES REUTILIZABLES
+% =============================================================
+\newtcolorbox{infobox}[1][]{enhanced,colback=Accent,colframe=Primary,boxrule=0.8pt,arc=2mm,left=3mm,right=3mm,top=2mm,bottom=2mm,#1}
+\newtcolorbox{resultbox}[1][]{enhanced,colback=SoftGray,colframe=PrimaryDark,boxrule=0.7pt,arc=2mm,title=Resultado clave,fonttitle=\bfseries,coltitle=white,colbacktitle=PrimaryDark,#1}
+\newtcolorbox{warningbox}[1][]{enhanced,colback=ANSYSGold!18,colframe=ANSYSGold!80!black,boxrule=0.7pt,arc=2mm,title=Nota de simulacion,fonttitle=\bfseries,#1}
+\newcommand{\captura}[3][0.88]{%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=#1\linewidth]{#2}
+    \caption{#3}
+\end{figure}}
+\newcommand{\dato}[2]{\textbf{#1:} #2\\}

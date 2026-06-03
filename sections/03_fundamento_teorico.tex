@@ -1,0 +1,106 @@
+\section{MARCO TEÓRICO}
+
+\subsection{Guías de onda rectangulares}
+
+Una guía de onda rectangular es una estructura metálica utilizada para transportar energía electromagnética en frecuencias de microondas. Su funcionamiento se basa en la propagación de modos electromagnéticos, los cuales dependen de las dimensiones internas de la guía y de la frecuencia de operación.
+
+En una guía rectangular de ancho $a$ y alto $b$, el modo dominante es generalmente el modo $TE_{10}$, ya que posee la menor frecuencia de corte. Para este modo, la frecuencia de corte se expresa como:
+
+\begin{equation}
+f_c = \frac{c}{2a}
+\end{equation}
+
+donde $c$ es la velocidad de la luz y $a$ es el ancho interno de la guía. Para que exista propagación, la frecuencia de operación debe ser mayor que la frecuencia de corte. Si la frecuencia es menor, la onda no se propaga adecuadamente y se atenúa dentro de la estructura.
+
+\subsection{Guía de onda WR42}
+
+La guía WR42 es una guía rectangular empleada en aplicaciones de microondas. En esta práctica se utiliza una estructura con dimensiones internas aproximadas de $420$ mils de ancho y $170$ mils de alto, diseñada para operar alrededor de $20$ GHz.
+
+Este tipo de guía resulta adecuada para aplicaciones de alta frecuencia debido a sus bajas pérdidas, buen confinamiento del campo electromagnético y capacidad para manejar niveles elevados de potencia. Por esta razón, es utilizada en sistemas como radares, comunicaciones satelitales, enlaces de microondas y redes de combinación de potencia.
+
+\subsection{Combinadores de potencia}
+
+Un combinador de potencia es un dispositivo pasivo que permite sumar señales provenientes de dos o más entradas y dirigir la energía resultante hacia un puerto de salida. En esta práctica se analiza un combinador de cuatro puertos, donde dos puertos actúan como entradas, uno como salida combinada y otro como puerto aislado.
+
+El funcionamiento del combinador depende de la magnitud y la fase de las señales aplicadas. Cuando las señales de entrada presentan la relación de fase adecuada, la energía se combina de manera constructiva hacia el puerto de salida. Al mismo tiempo, la energía no deseada o reflejada debe dirigirse preferiblemente hacia el puerto aislado.
+
+\subsection{Parámetros de dispersión}
+
+Los parámetros de dispersión, o parámetros $S$, permiten describir el comportamiento de una red de microondas a partir de ondas incidentes y reflejadas. El parámetro $S_{ij}$ representa la relación entre la onda que sale por el puerto $i$ y la onda que entra por el puerto $j$:
+
+\begin{equation}
+S_{ij} = \frac{b_i}{a_j}
+\end{equation}
+
+donde $a_j$ corresponde a la onda incidente en el puerto $j$ y $b_i$ corresponde a la onda transmitida o reflejada hacia el puerto $i$.
+
+En este laboratorio, los parámetros más importantes son:
+
+\begin{itemize}
+\item $S_{11}$: indica la reflexión en el puerto de referencia. Un valor bajo en magnitud representa buena adaptación.
+\item $S_{12}$ y $S_{14}$: permiten evaluar la transferencia de potencia entre los puertos principales del combinador.
+\item $S_{13}$: se asocia con el aislamiento entre el puerto de salida y el puerto aislado.
+\end{itemize}
+
+Los parámetros $S$ suelen expresarse en decibelios mediante:
+
+\begin{equation}
+S_{ij}(dB) = 20\log_{10}\left|S_{ij}\right|
+\end{equation}
+
+Un valor más negativo indica menor reflexión o menor transmisión, dependiendo del parámetro analizado.
+
+\subsection{Pérdida de retorno}
+
+La pérdida de retorno permite evaluar la cantidad de energía que se refleja en un puerto debido a desadaptaciones de impedancia. Se relaciona directamente con el parámetro $S_{11}$:
+
+\begin{equation}
+RL = -20\log_{10}\left|S_{11}\right|
+\end{equation}
+
+Una pérdida de retorno alta indica que el puerto se encuentra bien adaptado, ya que una menor parte de la señal incidente es reflejada hacia la fuente.
+
+\subsection{Pérdida de inserción}
+
+La pérdida de inserción mide la reducción de potencia cuando la señal se transmite desde un puerto de entrada hacia un puerto de salida. Para una transmisión entre los puertos $j$ e $i$, se expresa como:
+
+\begin{equation}
+IL = -20\log_{10}\left|S_{ij}\right|
+\end{equation}
+
+En un combinador de potencia, la pérdida de inserción debe ser baja para que la mayor cantidad posible de energía llegue al puerto de salida. Si esta pérdida aumenta, el dispositivo entrega menos potencia útil y su eficiencia disminuye.
+
+\subsection{Aislamiento}
+
+El aislamiento indica qué tan desacoplados se encuentran dos puertos que idealmente no deberían intercambiar energía. En el caso del combinador, el puerto aislado debe recibir la menor cantidad posible de potencia durante la operación normal.
+
+Un buen aislamiento se evidencia cuando el parámetro asociado al puerto aislado presenta un valor muy negativo en decibelios. Esto significa que la señal transmitida hacia ese puerto es pequeña en comparación con la señal incidente.
+
+\subsection{Wave Ports en HFSS}
+
+Los \textit{Wave Ports} son excitaciones utilizadas en HFSS para introducir y medir ondas electromagnéticas en estructuras como guías de onda. Estos puertos permiten calcular los modos de propagación, la impedancia modal y los parámetros $S$ del sistema.
+
+La correcta asignación de los puertos es fundamental, ya que de ella depende que la simulación represente adecuadamente el comportamiento físico del dispositivo. Un puerto mal definido puede generar resultados incorrectos, modos no deseados o errores en la interpretación de la transmisión y reflexión.
+
+\subsection{Condiciones de frontera en HFSS}
+
+Las condiciones de frontera definen cómo interactúan los campos electromagnéticos con las superficies del modelo. En una guía de onda, las paredes metálicas confinan el campo y permiten la propagación de la energía dentro de la estructura.
+
+En HFSS pueden emplearse fronteras conductoras para representar las paredes metálicas del dispositivo. Si se considera una conductividad finita, el modelo toma en cuenta pérdidas asociadas al material conductor, lo cual permite obtener una simulación más cercana al comportamiento real.
+
+\subsection{Simetría Perfect E}
+
+Cuando una estructura presenta simetría geométrica y electromagnética, es posible reducir el dominio de simulación aplicando una condición de simetría. En esta práctica se utiliza una frontera tipo \textit{Perfect E}, la cual permite modelar solo una parte del combinador y representar el efecto del resto de la estructura.
+
+El uso de esta condición reduce el número de elementos de malla y disminuye el tiempo de simulación, sin afectar la validez física del modelo cuando la simetría ha sido correctamente aplicada.
+
+\subsection{Campo eléctrico}
+
+La distribución del campo eléctrico permite observar cómo se propaga y concentra la energía dentro del combinador. En una guía de onda rectangular operando en el modo dominante, el campo presenta una distribución característica dentro de la sección transversal.\\
+En el combinador, el análisis de la magnitud del campo eléctrico permite identificar las zonas donde ocurre la interacción entre las señales de entrada. Una alta concentración de campo en la región de unión indica que allí se produce la combinación de energía electromagnética. Por esta razón, el campo eléctrico complementa el análisis de los parámetros $S$ y ayuda a interpretar físicamente el funcionamiento del dispositivo.El análisis de la magnitud del campo eléctrico permite observar cómo se distribuye la energía dentro del combinador. En la guía de onda, el campo se propaga siguiendo el modo dominante, mientras que en la zona de unión se produce la interacción entre las señales de entrada.La visualización del campo eléctrico complementa el análisis de los parámetros $S$, ya que permite identificar regiones de alta concentración de energía, zonas de combinación y posibles pérdidas o desadaptaciones dentro de la estructura.
+
+\begin{equation}
+    F = ma
+\end{equation}
+
+Reemplaza la ecuacion anterior por la expresion fisica correspondiente a tu practica.
