@@ -1,135 +1,75 @@
 % =============================================================
-% PORTADA FORMAL MODERNA
-% INFORME DE LABORATORIO - TELECOMUNICACIONES
+% PORTADA FORMAL MODERNA - INFORME TÉCNICO
+% UNIVERSIDAD NACIONAL DE SAN AGUSTÍN
 % =============================================================
 
 \begin{titlepage}
 \thispagestyle{empty}
 \centering
 
+\vspace*{0.2cm}
 
 % =============================================================
-% UNIVERSIDAD Y ESCUELA
+% ENCABEZADO: UNIVERSIDAD Y FACULTAD
 % =============================================================
+{\Large\bfseries\color{PrimaryDark}\MakeUppercase{\NombreUniversidad}\par}
+\vspace{0.12cm}
+{\normalsize\scshape\color{TextGray}\NombreFacultad\par}
+\vspace{0.08cm}
+{\small\color{MutedGray}\NombreEscuela\par}
 
-\vspace*{0.25cm}
-
-{\Large\bfseries\color{PrimaryDark}
-\NombreUniversidad\par}
-
-\vspace{0.10cm}
-
-{\normalsize\scshape\color{TextGray}
-\NombreEscuela\par}
-
-\vspace{0.15cm}
-
-{\small\color{MutedGray}
-Ingeniería de Telecomunicaciones
-\par}
-
-\vspace{0.35cm}
-
-{\color{Primary}\rule{0.65\linewidth}{0.8pt}}
+\vspace{0.4cm}
+{\color{Primary}\rule{0.8\linewidth}{1pt}}
+\vspace{0.8cm}
 
 % =============================================================
 % LOGOTIPO
 % =============================================================
+\includegraphics[width=0.28\linewidth]{\LogoUniversidad}
 
-\vspace{0.90cm}
-
-\includegraphics[
-width=0.25\linewidth
-]{figures/logo.png}
+\vspace{1.0cm}
 
 % =============================================================
-% CURSO
+% ASIGNATURA Y NÚMERO DE LABORATORIO
 % =============================================================
+{\small\scshape\color{MutedGray}Asignatura\par}
+\vspace{0.05cm}
+{\large\bfseries\color{TextGray}\NombreCurso\par}
+\vspace{0.5cm}
+{\large\bfseries\color{PrimaryDark}\MakeUppercase{\NumeroLaboratorio}\par}
 
-\vspace{0.75cm}
-
-{\normalsize\color{TextGray}
-Asignatura
-\par}
-
-\vspace{0.07cm}
-
-{\large\bfseries
-\NombreCurso
-\par}
+\vspace{0.3cm}
 
 % =============================================================
-% LABORATORIO
+% TÍTULO DEL INFORME
 % =============================================================
+{\color{Primary}\rule{0.5\linewidth}{0.6pt}}
+\vspace{0.4cm}
 
-\vspace{0.75cm}
+{\fontsize{18}{22}\selectfont\bfseries\color{black}\TituloInforme\par}
 
-{\large\bfseries\color{PrimaryDark}
-\MakeUppercase{\NumeroLaboratorio}
-\par}
+\vspace{0.4cm}
+{\color{Primary}\rule{0.5\linewidth}{0.6pt}}
 
-% =============================================================
-% TÍTULO
-% =============================================================
-
-\vspace{0.25cm}
-
-{\fontsize{20}{24}\selectfont\bfseries\color{black}
-\TituloInforme
-\par}
-
-\vspace{0.50cm}
-
-{\color{Primary}\rule{0.45\linewidth}{0.8pt}}
+\vspace{1.0cm}
 
 % =============================================================
-% DOCENTE
+% METADATOS: DOCENTE E INTEGRANTES (REJILLA ALINEADA)
 % =============================================================
-
-\vspace{0.60cm}
-
-{\normalsize\bfseries\color{PrimaryDark}
-Docente
-\par}
-
-\vspace{0.08cm}
-
-{\normalsize
-\NombreDocente
-\par}
-
-% =============================================================
-% INTEGRANTES
-% =============================================================
-
-\vspace{0.45cm}
-
-{\normalsize\bfseries\color{PrimaryDark}
-Integrantes
-\par}
-
-\vspace{0.15cm}
-
-\renewcommand{\arraystretch}{1.20}
-
-\begin{tabular}{c}
--- \NombreAutorUno \quad  \quad \CodigoAutorUno \\
--- \NombreAutorDos \quad  \quad \CodigoAutorDos
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{r @{\quad\:\quad} l}
+    \textbf{\color{PrimaryDark}Docente}     & \NombreDocente \\
+    \textbf{\color{PrimaryDark}Integrantes} & \NombreAutorUno \ \ \CodigoAutorUno \\
+                                            & \NombreAutorDos \ \ \CodigoAutorDos
 \end{tabular}
+
+\vfill
 
 % =============================================================
 % PIE DE PORTADA
 % =============================================================
-
-\vfill
-
-{\small\color{TextGray}
-Arequipa -- Perú
-\par}
-
-\vspace{0.05cm}
-
-{\small\color{TextGray}
+{\small\color{MutedGray}
+Arequipa -- Perú \\
 \FechaInforme
 \par}
 

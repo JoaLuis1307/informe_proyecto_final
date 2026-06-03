@@ -17,6 +17,14 @@
 \definecolor{RuleGray}{HTML}{CBD5E1}
 \definecolor{MutedGray}{HTML}{64748B}
 
+% Colores semánticos para tarjetas de diseño moderno
+\definecolor{WarnBorder}{HTML}{D97706} % Amber/Oro
+\definecolor{WarnBG}{HTML}{FFFBEB}     % Fondo Oro ultra-suave
+\definecolor{SuccessBorder}{HTML}{059669} % Esmeralda/Verde
+\definecolor{SuccessBG}{HTML}{F0FDF4}     % Fondo Verde ultra-suave
+\definecolor{InfoBorder}{HTML}{4F46E5}    % Indigo/Azul
+\definecolor{InfoBG}{HTML}{F5F3FF}        % Fondo Indigo ultra-suave
+
 % -------------------------------------------------------------
 % PDF
 % -------------------------------------------------------------
@@ -26,7 +34,8 @@
     linkcolor=PrimaryDark,
     citecolor=PrimaryDark,
     urlcolor=PrimaryDark,
-    pdftitle={\TituloInforme}
+    pdftitle={\TituloInforme},
+    hypertexnames=false
 }
 % =============================================================
 % TEXTO GENERAL
@@ -102,51 +111,30 @@
 % ENCABEZADO Y PIE
 % =============================================================
 
-\pagestyle{fancy}
-\fancyhf{}
+\fancypagestyle{informe}{
+    \fancyhf{}
+    \fancyfoot[C]{\scriptsize\color{MutedGray}\thepage\ de\ \pageref*{LastPage}}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0pt}
+}
 
-\fancyhead[L]{\footnotesize\color{MutedGray}\NumeroLaboratorio}
-\fancyhead[R]{\footnotesize\color{MutedGray}\nouppercase{\leftmark}}
-\fancyfoot[C]{\footnotesize\color{MutedGray}\thepage}
-
-\renewcommand{\headrulewidth}{0.35pt}
-\renewcommand{\footrulewidth}{0pt}
+\pagestyle{informe}
 
 \renewcommand{\sectionmark}[1]{%
-    \markboth{\thesection.\ #1}{}
+    \markboth{\thesection.\ #1}{\thesection.\ #1}
 }
+\renewcommand{\subsectionmark}[1]{}
 
-% Mismo encabezado incluso si LaTeX cambia a plain
-\fancypagestyle{fancyplain}{
-    \fancyhf{}
-    \fancyhead[L]{\footnotesize\color{MutedGray}\NumeroLaboratorio}
-    \fancyhead[R]{\footnotesize\color{MutedGray}\nouppercase{\leftmark}}
-    \fancyfoot[C]{\footnotesize\color{MutedGray}\thepage}
-    \renewcommand{\headrulewidth}{0.35pt}
-    \renewcommand{\footrulewidth}{0pt}
-}
-
-% Para índice y páginas sin encabezado
+% Para índice y páginas sin encabezado (TOC, Referencias, etc.)
 \fancypagestyle{plain}{
     \fancyhf{}
-    \fancyfoot[C]{\footnotesize\color{MutedGray}\thepage}
+    \fancyfoot[C]{\scriptsize\color{MutedGray}\thepage}
     \renewcommand{\headrulewidth}{0pt}
     \renewcommand{\footrulewidth}{0pt}
 }
 
 % =============================================================
-% PORTADA - ÍNDICE - REFERENCIAS
-% =============================================================
-
-\fancypagestyle{plain}{
-    \fancyhf{}
-    \fancyfoot[C]{\footnotesize\color{MutedGray}\thepage}
-    \renewcommand{\headrulewidth}{0pt}
-    \renewcommand{\footrulewidth}{0pt}
-}
-
-% =============================================================
-% FIGURAS
+% CONFIGURACIÓN DE CAPTIONS (TÍTULOS DE FIGURAS Y TABLAS)
 % =============================================================
 
 \captionsetup{
@@ -155,6 +143,31 @@
     textfont=it,
     justification=centering,
     singlelinecheck=false
+}
+\captionsetup[figure]{aboveskip=8pt, belowskip=4pt}
+\captionsetup[table]{aboveskip=6pt, belowskip=8pt} % Espacio ordenado debajo del título de la tabla
+
+% =============================================================
+% COMPORTAMIENTO Y ESPACIADO DE ELEMENTOS FLOTANTES (FIGURAS/TABLAS)
+% =============================================================
+
+% Evita que las figuras se acumulen al final o dejen páginas vacías
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.75}
+
+% Distancia ordenada entre flotantes y el texto
+\setlength{\floatsep}{12pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{14pt plus 2pt minus 4pt}
+\setlength{\intextsep}{12pt plus 2pt minus 2pt}
+
+% Espaciado compacto para ecuaciones (evita grandes huecos blancos en interlineado 1.5)
+\AtBeginDocument{
+    \setlength{\abovedisplayskip}{6pt plus 2pt minus 2pt}
+    \setlength{\belowdisplayskip}{6pt plus 2pt minus 2pt}
+    \setlength{\abovedisplayshortskip}{0pt plus 2pt}
+    \setlength{\belowdisplayshortskip}{4pt plus 2pt minus 2pt}
 }
 
 % =============================================================
@@ -183,17 +196,25 @@
 % CÓDIGO
 % =============================================================
 
+\newcommand{\noncopynumber}[1]{%
+    \BeginAccSupp{ActualText={}}%
+    \tiny\color{MutedGray}#1%
+    \EndAccSupp{}%
+}
+
 \lstdefinestyle{labcode}{
     backgroundcolor=\color{SoftGray},
     basicstyle=\ttfamily\small,
     breaklines=true,
-    frame=single,
+    columns=flexible,
+    keepspaces=true,
+    frame=none,
     rulecolor=\color{RuleGray},
     keywordstyle=\bfseries\color{PrimaryDark},
     commentstyle=\itshape\color{MutedGray},
     stringstyle=\color{Primary},
     numbers=left,
-    numberstyle=\tiny\color{MutedGray},
+    numberstyle=\noncopynumber,
     xleftmargin=1.3em,
     framexleftmargin=1.0em,
     aboveskip=0.6em,
@@ -201,4 +222,47 @@
 }
 
 \lstset{style=labcode}
+
+% =============================================================
+% CONFIGURACIÓN DE ÍNDICES (TOC, LOF, LOT)
+% =============================================================
+
+% Puntos de guía (dot leaders) para secciones, subsecciones y subsubsecciones
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsecleader}{\normalfont\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsubsecleader}{\normalfont\cftdotfill{\cftdotsep}}
+
+% Estilo de fuentes para Sección (negrita y color principal)
+\renewcommand{\cftsecfont}{\bfseries\color{PrimaryDark}}
+\renewcommand{\cftsecpagefont}{\bfseries\color{PrimaryDark}}
+
+% Estilo de fuentes para Subsección y Subsubsección
+\renewcommand{\cftsubsecfont}{\normalfont\color{TextGray}}
+\renewcommand{\cftsubsecpagefont}{\normalfont\color{TextGray}}
+\renewcommand{\cftsubsubsecfont}{\normalfont\color{MutedGray}}
+\renewcommand{\cftsubsubsecpagefont}{\normalfont\color{MutedGray}}
+
+% Ajuste de espaciado vertical
+\setlength{\cftbeforesecskip}{0.6em}
+\setlength{\cftbeforesubsecskip}{0.25em}
+\setlength{\cftbeforesubsubsecskip}{0.15em}
+
+% Configuración para Índice de Figuras y Tablas
+\renewcommand{\cftfigfont}{\normalfont\color{TextGray}}
+\renewcommand{\cftfigpagefont}{\normalfont\color{TextGray}}
+\renewcommand{\cftfigleader}{\normalfont\cftdotfill{\cftdotsep}}
+
+\renewcommand{\cfttabfont}{\normalfont\color{TextGray}}
+\renewcommand{\cfttabpagefont}{\normalfont\color{TextGray}}
+\renewcommand{\cfttableader}{\normalfont\cftdotfill{\cftdotsep}}
+
+% Convertir secciones a mayúsculas automáticamente en el índice (TOC)
+\let\oldaddcontentsline\addcontentsline
+\renewcommand{\addcontentsline}[3]{%
+    \ifstrequal{#2}{section}%
+        {\oldaddcontentsline{#1}{#2}{\MakeUppercase{#3}}}%
+        {\oldaddcontentsline{#1}{#2}{#3}}%
+}
+
+
 

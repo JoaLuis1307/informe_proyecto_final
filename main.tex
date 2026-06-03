@@ -18,13 +18,14 @@
 \input{frontmatter/portada}
 
 \clearpage
+\pagenumbering{roman}
 \pagestyle{plain}
 \tableofcontents
 \thispagestyle{plain}
 
 \clearpage
-\pagestyle{fancy}
-\thispagestyle{fancy}
+\pagenumbering{arabic}
+\pagestyle{informe}
 
 \input{sections/01_introduccion}
 \input{sections/02_objetivos}
@@ -40,8 +41,7 @@
 \printbibliography[title={Referencias}]
 
 \clearpage
-\pagestyle{fancy}
-\thispagestyle{fancy}
+\pagestyle{informe}
 \appendix
 \input{appendices/anexo_a}
 
