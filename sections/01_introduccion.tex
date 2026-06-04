@@ -1,4 +1,366 @@
 \section{Introducción}
-En esta práctica se desarrolló la simulación electromagnética de un combinador de guía de onda WR42 operando alrededor de los 20 GHz, con el propósito de evaluar su comportamiento como estructura de combinación de potencia en sistemas de microondas. A diferencia de un análisis puramente teórico, el trabajo se centró en reproducir el proceso completo de diseño en HFSS: construcción geométrica del dispositivo, definición de condiciones de frontera, asignación de puertos de excitación, configuración de la solución y posterior interpretación de los resultados obtenidos.El dispositivo estudiado corresponde a una unión de cuatro puertos diseñada para combinar señales provenientes de dos entradas manteniendo bajas pérdidas y un adecuado aislamiento entre trayectorias. En este tipo de estructura, el comportamiento no depende únicamente de la forma física de la guía, sino también de la relación de fase entre las señales aplicadas, ya que una diferencia de fase apropiada permite que la potencia se sume de manera constructiva hacia el puerto de salida y se reduzca la energía dirigida al puerto aislado.
+En la manzana del Mercado San Camilo, Arequipa, la alta actividad comercial y peatonal genera una acumulación constante de residuos sólidos en contenedores municipales, lo que puede ocasionar desbordes, malos olores, contaminación visual y dificultades operativas para una atención oportuna. Frente a esta problemática, el proyecto propone el diseño e implementación de una infraestructura IoT basada en comunicación LoRa P2P para monitorear en tiempo real el estado de los contenedores municipales.
 
-Durante el laboratorio, la simulación permitió observar cómo las decisiones de modelado influyen directamente en la respuesta electromagnética del sistema. El uso de simetría, la correcta asignación de fronteras conductoras y la definición adecuada de los puertos fueron aspectos fundamentales para obtener resultados confiables sin aumentar innecesariamente el costo computacional. Posteriormente, mediante los parámetros de dispersión y la visualización del campo eléctrico, se evaluó la adaptación del dispositivo, la transferencia de potencia entre puertos y la distribución de energía dentro de la guía de onda.Este informe presenta el procedimiento seguido y el análisis de los resultados principales, con énfasis en la interpretación física de la simulación. De esta manera, la práctica no se limita a comprobar el funcionamiento de una herramienta computacional, sino que permite relacionar el modelo numérico con el comportamiento real esperado de un combinador de potencia en alta frecuencia.
+El sistema estará compuesto por nodos IoT instalados en los contenedores, un gateway LoRa-WiFi y una plataforma de monitoreo desarrollada para visualizar datos operativos y métricas de red. Los nodos permitirán medir variables como nivel de llenado, gases y estado de batería, mientras que el gateway registrará parámetros de comunicación como RSSI, SNR, pérdida de paquetes y latencia.
+
+Esta propuesta busca contribuir a una gestión urbana más inteligente, permitiendo detectar contenedores críticos, generar alertas, analizar el comportamiento de la red IoT y apoyar la toma de decisiones basada en datos en un entorno urbano-comercial real.
+\subsection{Problematica}
+La problemática se centra en el desborde de contenedores municipales en la manzana del Mercado San Camilo, ocasionado por la alta generación de residuos y la falta de monitoreo en tiempo real. El modelo tradicional de recolección, basado en horarios fijos o reportes manuales, no permite identificar oportunamente contenedores llenos o críticos. Además, no existe una infraestructura IoT local que permita supervisar el estado de los contenedores y evaluar el comportamiento de una red LoRa P2P en condiciones urbanas reales. Por ello, se requiere una solución que integre sensores, comunicación inalámbrica, gateway y plataforma de monitoreo, considerando métricas como RSSI, SNR, pérdida de paquetes, latencia, airtime, disponibilidad y consumo energético.
+\subsection{Objetivos}
+\subsubsection{Objetivo General}
+Diseñar, implementar y evaluar experimentalmente una red IoT basada en comunicación LoRa P2P para el monitoreo en tiempo real de contenedores municipales en la manzana del Mercado San Camilo, considerando el estado de llenado de los contenedores y el comportamiento de la red mediante métricas de comunicación, disponibilidad y consumo energético.
+\subsubsection{Objetivos específicos}
+
+\begin{itemize}
+    \item Seleccionar los componentes del sistema IoT para la construcción del nodo de monitoreo y del gateway LoRa-WiFi, considerando sensores, microcontroladores, módulos LoRa, antenas, alimentación, consumo energético, compatibilidad y facilidad de integración.
+
+    \item Diseñar la arquitectura de comunicación LoRa P2P entre los nodos instalados en los contenedores municipales y el gateway, definiendo la topología de red, los parámetros de transmisión, el formato de paquetes, el identificador de nodo y el número incremental de paquete.
+
+    \item Implementar los nodos IoT de monitoreo mediante un ESP32, sensores de nivel de llenado, temperatura, humedad, gases y batería, integrando el módulo LoRa SX1278 para la transmisión de datos hacia el gateway en modo P2P.
+
+    \item Implementar el gateway LoRa-WiFi utilizando un ESP32-S3 y un módulo LoRa SX1278, con la finalidad de recibir paquetes de los nodos, registrar métricas de comunicación como RSSI y SNR, validar los datos recibidos y reenviarlos al servidor central mediante MQTT.
+
+    \item Desarrollar la plataforma de monitoreo para visualizar el estado de los contenedores municipales y el comportamiento de la red IoT, utilizando React para el frontend, Fastify para la API, Mosquitto como broker MQTT, PostgreSQL para datos estructurados e InfluxDB para telemetría y métricas temporales.
+
+    \item Evaluar una estrategia de transmisión adaptativa que permita reducir el tiempo en aire, posibles colisiones y consumo energético de los nodos, considerando intervalos de transmisión, eventos críticos, estado de batería, retardo aleatorio y número incremental de paquete.
+
+    \item Evaluar experimentalmente el desempeño de la red LoRa P2P en la manzana del Mercado San Camilo, registrando métricas como RSSI, SNR, paquetes enviados, paquetes recibidos, pérdida de paquetes, latencia, disponibilidad de nodos y estado energético.
+
+    \item Validar el funcionamiento integral del sistema verificando el flujo completo de datos desde la adquisición en el nodo IoT, transmisión LoRa P2P, recepción en el gateway, publicación MQTT, almacenamiento en bases de datos y visualización en la plataforma de monitoreo.
+\end{itemize}
+\subsection{Alternativas de Solución}
+
+A partir de la problemática identificada en la manzana del Mercado San Camilo, relacionada con el desborde de contenedores municipales, la falta de monitoreo oportuno y la necesidad de mejorar la gestión de residuos, se analizaron cinco alternativas de solución. Estas alternativas consideran enfoques operativos, participativos y tecnológicos, con el propósito de seleccionar la opción más adecuada para el alcance del proyecto.
+
+\subsubsection{Alternativas consideradas}
+
+\begin{itemize}
+    \item \textbf{Optimización de recolección mediante horarios ajustados:} Esta alternativa consiste en modificar los horarios y frecuencias de recolección de residuos de acuerdo con la concentración comercial, el flujo peatonal y la generación estimada de residuos en la zona. Su objetivo es reducir la probabilidad de desborde mediante una mejor planificación operativa.
+    
+    \item \textbf{Reporte manual mediante aplicación o código QR:} Esta alternativa propone que comerciantes, ciudadanos o personal municipal reporten el estado de los contenedores mediante una aplicación, formulario digital o código QR instalado cerca del contenedor. Su finalidad es mejorar la comunicación entre los usuarios del espacio urbano y el personal encargado de la recolección.
+    
+    \item \textbf{Monitoreo mediante cámaras fijas o visión artificial:} Esta alternativa plantea el uso de cámaras ubicadas en puntos estratégicos para observar el estado externo de los contenedores y detectar acumulación visible de residuos. Puede complementarse con procesamiento de imágenes o visión artificial para identificar situaciones de desborde.
+    
+    \item \textbf{Sistema basado en LoRaWAN:} Esta alternativa utiliza nodos LoRaWAN, un gateway LoRaWAN y un servidor de red para gestionar la comunicación de los dispositivos hacia una plataforma de monitoreo. Es una solución estandarizada para redes IoT de largo alcance.
+    
+    \item \textbf{Sistema de monitoreo con red LoRa P2P, gateway propio y plataforma de gestión:} Esta alternativa propone instalar nodos de monitoreo en los contenedores municipales, los cuales transmiten datos mediante comunicación LoRa P2P hacia un gateway propio. El gateway recibe los paquetes, registra métricas de comunicación y reenvía la información hacia una plataforma de monitoreo y gestión.
+\end{itemize}
+
+\subsubsection{Comparación de alternativas}
+
+La Tabla~\ref{tab:comparacion_alternativas} presenta una comparación entre las alternativas consideradas, tomando en cuenta sus principales ventajas, desventajas y evaluación respecto al alcance del proyecto.
+
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{xltabular}{\linewidth}{
+>{\raggedright\arraybackslash}p{2.8cm}
+>{\raggedright\arraybackslash}X
+>{\raggedright\arraybackslash}X
+>{\raggedright\arraybackslash}p{2.7cm}}
+\caption{Comparación de alternativas de solución.}
+\label{tab:comparacion_alternativas} \\
+\toprule
+\textbf{Alternativa} & \textbf{Ventajas} & \textbf{Desventajas} & \textbf{Evaluación} \\
+\midrule
+\endfirsthead
+
+\multicolumn{4}{c}{\tablename\ \thetable{} -- Continúa de la página anterior} \\
+\toprule
+\textbf{Alternativa} & \textbf{Ventajas} & \textbf{Desventajas} & \textbf{Evaluación} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{4}{r}{\textit{Continúa en la siguiente página...}} \\
+\endfoot
+
+\bottomrule
+\endlastfoot
+
+\textbf{Horarios ajustados de recolección}
+&
+\begin{itemize}[leftmargin=*, nosep]
+    \item No requiere infraestructura tecnológica compleja.
+    \item Puede implementarse con recursos municipales existentes.
+    \item Mejora parcialmente la atención en zonas de alta generación de residuos.
+\end{itemize}
+&
+\begin{itemize}[leftmargin=*, nosep]
+    \item No permite conocer el estado real de los contenedores.
+    \item Puede generar recorridos innecesarios.
+    \item Mantiene una gestión basada en estimaciones.
+\end{itemize}
+&
+No seleccionada, debido a que no ofrece monitoreo en tiempo real.
+\\
+\midrule
+
+\textbf{Reporte manual mediante aplicación o código QR}
+&
+\begin{itemize}[leftmargin=*, nosep]
+    \item Promueve la participación ciudadana.
+    \item Permite reportar desbordes o acumulación externa de residuos.
+    \item Requiere menor infraestructura que un sistema con sensores.
+\end{itemize}
+&
+\begin{itemize}[leftmargin=*, nosep]
+    \item Depende de la voluntad de las personas.
+    \item La información puede ser subjetiva o tardía.
+    \item No garantiza monitoreo continuo.
+\end{itemize}
+&
+No seleccionada como solución principal, debido a su dependencia de reportes humanos.
+\\
+\midrule
+
+\textbf{Cámaras fijas o visión artificial}
+&
+\begin{itemize}[leftmargin=*, nosep]
+    \item Permite observar el entorno externo del contenedor.
+    \item Puede detectar acumulación visible de residuos.
+    \item Puede apoyar la supervisión urbana.
+\end{itemize}
+&
+\begin{itemize}[leftmargin=*, nosep]
+    \item No mide directamente el nivel interno del contenedor.
+    \item Puede verse afectada por iluminación, clima u obstáculos.
+    \item Puede generar preocupaciones relacionadas con privacidad.
+\end{itemize}
+&
+No seleccionada, debido a que no permite medir directamente el estado interno del contenedor.
+\\
+\midrule
+
+\textbf{Sistema basado en LoRaWAN}
+&
+\begin{itemize}[leftmargin=*, nosep]
+    \item Es una tecnología estandarizada para redes IoT de largo alcance.
+    \item Permite administrar múltiples nodos.
+    \item Integra mecanismos de gestión de red y seguridad.
+\end{itemize}
+&
+\begin{itemize}[leftmargin=*, nosep]
+    \item Requiere gateway LoRaWAN real.
+    \item Presenta mayor complejidad de configuración.
+    \item Puede depender de servidores externos o políticas de uso.
+\end{itemize}
+&
+No seleccionada para el alcance inicial, debido a su mayor complejidad e infraestructura requerida.
+\\
+\midrule
+
+\textbf{Red LoRa P2P con gateway propio y plataforma de gestión}
+&
+\begin{itemize}[leftmargin=*, nosep]
+    \item Permite monitorear los contenedores en tiempo real.
+    \item No requiere infraestructura LoRaWAN completa.
+    \item Permite controlar directamente la comunicación nodo-gateway.
+    \item Permite evaluar RSSI, SNR, pérdida de paquetes, latencia y disponibilidad.
+\end{itemize}
+&
+\begin{itemize}[leftmargin=*, nosep]
+    \item Requiere instalación y protección física de nodos.
+    \item La comunicación puede verse afectada por obstáculos urbanos.
+    \item Se debe controlar airtime, colisiones y consumo energético.
+\end{itemize}
+&
+Seleccionada, porque se ajusta al alcance del proyecto y permite una evaluación experimental en el Mercado San Camilo.
+\\
+\end{xltabular}
+\endgroup
+
+\subsubsection{Alternativa seleccionada}
+
+De acuerdo con el análisis realizado, la alternativa seleccionada es el \textbf{sistema de monitoreo con red LoRa P2P, gateway propio y plataforma de gestión}. Esta alternativa responde directamente a la problemática identificada en la manzana del Mercado San Camilo, ya que permite conocer el estado de los contenedores municipales, detectar condiciones críticas y generar información útil para la gestión de residuos.
+
+A diferencia de las alternativas basadas únicamente en horarios ajustados, reportes manuales o inspección visual, esta solución permite obtener datos del estado real de los contenedores. En comparación con LoRaWAN, la comunicación LoRa P2P con gateway propio se ajusta mejor al alcance del proyecto, al permitir una implementación controlada y una evaluación experimental del comportamiento de la red.
+
+Por ello, la alternativa seleccionada no se plantea únicamente como una solución tecnológica, sino como un sistema de monitoreo y gestión de contenedores municipales orientado a mejorar la supervisión, generar alertas y evaluar el desempeño de la comunicación en un entorno urbano real como la manzana del Mercado San Camilo.
+
+\subsection{Otras Consideraciones}
+
+Además del diseño e implementación técnica del sistema, se consideran aspectos complementarios que influyen en la utilidad, viabilidad y pertinencia del proyecto. Estas consideraciones permiten analizar la propuesta no solo como una solución tecnológica, sino como un sistema de apoyo a la gestión urbana de residuos en la manzana del Mercado San Camilo.
+
+\subsubsection{Gestión municipal y toma de decisiones}
+
+El sistema propuesto permite transformar el estado físico de los contenedores municipales en información útil para la toma de decisiones. Mediante el monitoreo del nivel de llenado, estado del nodo, alertas y disponibilidad de datos, la plataforma puede apoyar la identificación de contenedores críticos y la priorización de atención.
+
+Esta consideración es relevante porque la problemática principal no se limita a la acumulación de residuos, sino a la falta de información oportuna para gestionar los contenedores antes de que ocurra el desborde. Por ello, el sistema puede contribuir a una gestión más organizada, basada en datos y menos dependiente de inspecciones visuales o reportes manuales.
+
+\subsubsection{Salud pública y medio ambiente}
+
+El desborde de contenedores municipales puede generar malos olores, contaminación visual y condiciones favorables para la presencia de insectos, roedores u otros vectores. En una zona de alta actividad comercial y peatonal como el Mercado San Camilo, estas condiciones pueden afectar a comerciantes, compradores y transeúntes.
+
+El monitoreo oportuno del estado de los contenedores puede contribuir a reducir la exposición de residuos en la vía pública, permitiendo generar alertas cuando un contenedor se encuentre lleno o próximo a un estado crítico. De esta manera, el sistema puede apoyar indirectamente la mejora de las condiciones de salubridad y limpieza del entorno urbano.
+
+\subsubsection{Desempeño de la red de comunicación}
+
+Debido a que el sistema utiliza comunicación LoRa P2P, es necesario considerar el comportamiento de la red en un entorno urbano real. La presencia de paredes, estructuras metálicas, vehículos, personas y otros obstáculos puede afectar la calidad del enlace entre los nodos y el gateway.
+
+Por esta razón, el proyecto debe evaluar métricas como RSSI, SNR, pérdida de paquetes, latencia, disponibilidad del nodo y estabilidad de comunicación. Estas métricas permiten determinar si la red LoRa P2P es adecuada para el monitoreo de contenedores municipales en la manzana del Mercado San Camilo.
+
+\subsubsection{Consumo energético de los nodos}
+
+Los nodos IoT instalados en los contenedores pueden operar con batería, por lo que el consumo energético es un aspecto importante para la continuidad del sistema. Una frecuencia de transmisión elevada, sensores activos permanentemente o paquetes de datos extensos pueden reducir la autonomía del nodo.
+
+Para mitigar este problema, se deben considerar estrategias como intervalos de transmisión adecuados, activación selectiva de sensores, uso de paquetes compactos y modos de bajo consumo. Asimismo, una estrategia de transmisión adaptativa puede reducir envíos innecesarios cuando el contenedor no presenta cambios relevantes.
+
+\subsubsection{Airtime, colisiones y estabilidad de la red}
+
+En una red LoRa P2P, varios nodos pueden intentar transmitir hacia el mismo gateway. Si no existe una estrategia de control, pueden generarse colisiones, pérdida de paquetes y ocupación innecesaria del canal de comunicación.
+
+Por ello, el sistema debe considerar mecanismos como identificador de nodo, número incremental de paquete, retardo aleatorio, intervalos diferenciados y transmisión por evento crítico. Estas medidas permiten mejorar la estabilidad de la red y facilitar el análisis experimental del comportamiento de la comunicación.
+
+\subsubsection{Seguridad operativa del sistema}
+
+El sistema debe mantener una operación estable durante las pruebas de campo. Para ello, es necesario proteger físicamente los nodos, asegurar una alimentación adecuada, evitar exposición directa a humedad o golpes, y verificar la correcta instalación del gateway.
+
+También se debe considerar la seguridad de la información transmitida hacia la plataforma, especialmente en la comunicación MQTT y en el acceso al sistema de monitoreo. El uso de credenciales, control de usuarios y configuración segura del servidor contribuye a la confiabilidad de la plataforma.
+
+\subsubsection{Aspectos legales y permisos}
+
+La instalación de dispositivos en espacios públicos o infraestructura municipal debe considerar autorizaciones previas de la entidad correspondiente. Asimismo, el proyecto debe respetar la normativa vigente relacionada con gestión de residuos, uso de infraestructura urbana y operación de equipos de comunicación.
+
+En caso de que la plataforma registre usuarios, reportes ciudadanos o información personal, se deben considerar medidas de protección de datos. Si el sistema solo almacena información técnica de nodos, contenedores y métricas de red, el riesgo relacionado con datos personales es menor.
+
+\subsubsection{Aceptación social y uso del sistema}
+
+La aceptación del sistema por parte de comerciantes, personal municipal y usuarios del entorno es importante para su aplicación en un escenario real. Aunque el sistema funcione técnicamente, su utilidad dependerá de que los actores involucrados comprendan su finalidad y beneficios.
+
+Por ello, se recomienda informar sobre el propósito del sistema, su funcionamiento y el tipo de datos que registra. La plataforma debe ser clara, fácil de interpretar y orientada a apoyar la gestión de residuos, no solo a mostrar datos técnicos.
+
+\subsubsection{Planificación urbana y análisis histórico}
+
+Los datos almacenados por la plataforma pueden utilizarse posteriormente para analizar patrones de acumulación de residuos, horarios críticos, contenedores con mayor frecuencia de llenado y zonas con mayor demanda de atención.
+
+Aunque el alcance principal del proyecto es el monitoreo y evaluación experimental del sistema, la información histórica generada puede servir como base para futuras decisiones relacionadas con ubicación de contenedores, frecuencia de recolección y mejora de la planificación urbana.
+
+\subsubsection{Escalabilidad y resiliencia urbana}
+
+El sistema propuesto puede ampliarse progresivamente mediante la incorporación de más nodos, gateways o zonas de monitoreo. Sin embargo, dicha ampliación debe considerar la capacidad de la red, el control de transmisiones, la cobertura del gateway y la estabilidad de la plataforma.
+
+Desde el enfoque de resiliencia urbana, contar con información en tiempo real permite responder con mayor rapidez ante condiciones críticas, eventos de alta afluencia o acumulación inesperada de residuos. Esto puede fortalecer la capacidad de adaptación del sistema de gestión de residuos en espacios urbanos dinámicos como el Mercado San Camilo.
+\subsection{Diagrama de Flujo}
+La Figura~\ref{fig:flujo_proyecto} muestra de forma ordenada las etapas que seguirá el proyecto. El proceso comienza con la identificación del problema principal: el desborde de contenedores municipales en la manzana del Mercado San Camilo y la falta de información oportuna sobre su estado.
+
+Luego, se definen los requisitos del sistema, considerando qué variables se medirán, qué métricas de red se evaluarán y bajo qué condiciones se realizarán las pruebas. Con esta información, se seleccionan los componentes del nodo IoT y del gateway, como sensores, microcontroladores, módulos LoRa, antenas y elementos de alimentación.
+
+Después, se diseña la arquitectura del sistema, integrando los nodos IoT, la comunicación LoRa P2P, el gateway LoRa-WiFi, el servidor central y la plataforma de monitoreo. Posteriormente, se implementan e integran estos componentes para asegurar que los datos puedan viajar correctamente desde los sensores hasta la plataforma.
+
+Finalmente, se realizan pruebas experimentales para evaluar el nivel de llenado, RSSI, SNR, pérdida de paquetes, latencia, disponibilidad y batería. Si los resultados no cumplen los criterios definidos, se realizan los ajustes necesarios. Si cumplen, se procede con el análisis de resultados, la validación del sistema, las conclusiones y los trabajos futuros.
+\begin{figure}[H]
+\centering
+\footnotesize
+\resizebox{0.70\linewidth}{!}{
+\begin{tikzpicture}[
+    node distance=0.55cm,
+    etapa/.style={
+        rectangle,
+        rounded corners,
+        draw=black,
+        align=center,
+        text width=3.5cm,
+        minimum height=0.8cm
+    },
+    decision/.style={
+        diamond,
+        draw=black,
+        align=center,
+        text width=2.4cm,
+        aspect=2,
+        inner sep=1pt
+    },
+    flecha/.style={
+        -{Latex[length=2.5mm]},
+        thick
+    }
+]
+
+\node (inicio) [etapa] {
+\textbf{Inicio del proyecto}
+};
+
+\node (problema) [etapa, below=of inicio] {
+\textbf{Identificación del problema}\\
+Desborde de contenedores en la manzana del Mercado San Camilo
+};
+
+\node (requisitos) [etapa, below=of problema] {
+\textbf{Definición de requisitos}\\
+Variables, métricas, alcance y condiciones de prueba
+};
+
+\node (componentes) [etapa, below=of requisitos] {
+\textbf{Selección de componentes}\\
+Sensores, ESP32, ESP32-S3, LoRa, antena y alimentación
+};
+
+\node (arquitectura) [etapa, below=of componentes] {
+\textbf{Diseño de arquitectura}\\
+Nodo IoT, LoRa P2P, gateway, servidor y plataforma
+};
+
+\node (implementacion) [etapa, below=of arquitectura] {
+\textbf{Implementación}\\
+Nodos, gateway, MQTT, API, bases de datos y frontend
+};
+
+\node (integracion) [etapa, below=of implementacion] {
+\textbf{Integración del sistema}\\
+Flujo de datos desde sensores hasta la plataforma
+};
+
+\node (pruebas) [etapa, below=of integracion] {
+\textbf{Pruebas experimentales}\\
+Nivel, RSSI, SNR, pérdida, latencia y batería
+};
+
+\node (decision) [decision, below=of pruebas] {
+¿Cumple\\criterios?
+};
+
+\node (ajustes) [etapa, right=1.2cm of decision] {
+\textbf{Ajustes}\\
+Firmware, sensores, parámetros LoRa o plataforma
+};
+
+% Nodo dummy invisible en el lado izquierdo para balancear el bounding box y centrar el diagrama
+\node (dummy) [etapa, left=1.2cm of decision, draw=none] {};
+
+\node (analisis) [etapa, below=of decision] {
+\textbf{Análisis de resultados}\\
+Desempeño, disponibilidad, consumo y red
+};
+
+\node (validacion) [etapa, below=of analisis] {
+\textbf{Validación}\\
+Funcionamiento integral del sistema
+};
+
+\node (fin) [etapa, below=of validacion] {
+\textbf{Conclusiones}\\
+Limitaciones y trabajos futuros
+};
+
+\draw [flecha] (inicio) -- (problema);
+\draw [flecha] (problema) -- (requisitos);
+\draw [flecha] (requisitos) -- (componentes);
+\draw [flecha] (componentes) -- (arquitectura);
+\draw [flecha] (arquitectura) -- (implementacion);
+\draw [flecha] (implementacion) -- (integracion);
+\draw [flecha] (integracion) -- (pruebas);
+\draw [flecha] (pruebas) -- (decision);
+\draw [flecha] (decision) -- node[right]{Sí} (analisis);
+\draw [flecha] (decision) -- node[above]{No} (ajustes);
+\draw [flecha] (ajustes) |- (integracion);
+\draw [flecha] (analisis) -- (validacion);
+\draw [flecha] (validacion) -- (fin);
+
+\end{tikzpicture}
+}
+\caption{Diagrama de flujo por etapas del proyecto.}
+\label{fig:flujo_proyecto}
+\end{figure}
+\subsection{Cronograma}
+\subsection{Presupuesto}
