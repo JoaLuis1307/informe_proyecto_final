@@ -68,9 +68,9 @@
 % TÍTULOS
 % =============================================================
 
-\titleformat{\section}
+\titleformat{\chapter}
 {\Large\bfseries\color{Primary}}
-{\thesection.}
+{\thechapter.}
 {0.75em}
 {}
 [
@@ -78,32 +78,43 @@
 {\color{Primary}\titlerule[0.6pt]}
 ]
 
-\titleformat{\subsection}
+\titleformat{\section}
 {\large\bfseries\color{PrimaryDark}}
-{\thesubsection.}
+{\thesection.}
 {0.60em}
 {}
 
-\titleformat{\subsubsection}
+\titleformat{\subsection}
 {\normalsize\bfseries\color{TextGray}}
-{\thesubsubsection.}
+{\thesubsection.}
 {0.50em}
 {}
 
-\titlespacing*{\section}
+\titleformat{\subsubsection}
+{\normalsize\bfseries\color{MutedGray}}
+{\thesubsubsection.}
+{0.40em}
+{}
+
+\titlespacing*{\chapter}
 {0pt}
-{1.70em}
+{0.50em}
 {0.75em}
 
-\titlespacing*{\subsection}
+\titlespacing*{\section}
 {0pt}
 {1.00em}
 {0.40em}
 
-\titlespacing*{\subsubsection}
+\titlespacing*{\subsection}
 {0pt}
 {0.70em}
 {0.25em}
+
+\titlespacing*{\subsubsection}
+{0pt}
+{0.50em}
+{0.20em}
 
 % =============================================================
 % ENCABEZADO Y PIE
@@ -118,10 +129,10 @@
 
 \pagestyle{informe}
 
-\renewcommand{\sectionmark}[1]{%
-    \markboth{\thesection.\ #1}{\thesection.\ #1}
+\renewcommand{\chaptermark}[1]{%
+    \markboth{\thechapter.\ #1}{\thechapter.\ #1}
 }
-\renewcommand{\subsectionmark}[1]{}
+\renewcommand{\sectionmark}[1]{}
 
 % Para índice y páginas sin encabezado (TOC, Referencias, etc.)
 \fancypagestyle{plain}{
@@ -227,25 +238,29 @@
 % CONFIGURACIÓN DE ÍNDICES (TOC, LOF, LOT)
 % =============================================================
 
-% Puntos de guía (dot leaders) para secciones, subsecciones y subsubsecciones
-\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftchapnumwidth}{2.8em}
+\setlength{\cftsecnumwidth}{3.2em}
+\setlength{\cftsubsecnumwidth}{3.8em}
+
+% Puntos de guía (dot leaders) para capítulos, secciones y subsecciones
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsecleader}{\normalfont\cftdotfill{\cftdotsep}}
 \renewcommand{\cftsubsecleader}{\normalfont\cftdotfill{\cftdotsep}}
-\renewcommand{\cftsubsubsecleader}{\normalfont\cftdotfill{\cftdotsep}}
 
-% Estilo de fuentes para Sección (negrita y color principal)
-\renewcommand{\cftsecfont}{\bfseries\color{PrimaryDark}}
-\renewcommand{\cftsecpagefont}{\bfseries\color{PrimaryDark}}
+% Estilo de fuentes para Capítulo (negrita y color principal)
+\renewcommand{\cftchapfont}{\bfseries\color{PrimaryDark}}
+\renewcommand{\cftchappagefont}{\bfseries\color{PrimaryDark}}
 
-% Estilo de fuentes para Subsección y Subsubsección
-\renewcommand{\cftsubsecfont}{\normalfont\color{TextGray}}
-\renewcommand{\cftsubsecpagefont}{\normalfont\color{TextGray}}
-\renewcommand{\cftsubsubsecfont}{\normalfont\color{MutedGray}}
-\renewcommand{\cftsubsubsecpagefont}{\normalfont\color{MutedGray}}
+% Estilo de fuentes para Sección y Subsección
+\renewcommand{\cftsecfont}{\normalfont\color{TextGray}}
+\renewcommand{\cftsecpagefont}{\normalfont\color{TextGray}}
+\renewcommand{\cftsubsecfont}{\normalfont\color{MutedGray}}
+\renewcommand{\cftsubsecpagefont}{\normalfont\color{MutedGray}}
 
 % Ajuste de espaciado vertical
-\setlength{\cftbeforesecskip}{0.6em}
-\setlength{\cftbeforesubsecskip}{0.25em}
-\setlength{\cftbeforesubsubsecskip}{0.15em}
+\setlength{\cftbeforechapskip}{0.6em}
+\setlength{\cftbeforesecskip}{0.25em}
+\setlength{\cftbeforesubsecskip}{0.15em}
 
 % Configuración para Índice de Figuras y Tablas
 \renewcommand{\cftfigfont}{\normalfont\color{TextGray}}
@@ -256,10 +271,10 @@
 \renewcommand{\cfttabpagefont}{\normalfont\color{TextGray}}
 \renewcommand{\cfttableader}{\normalfont\cftdotfill{\cftdotsep}}
 
-% Convertir secciones a mayúsculas automáticamente en el índice (TOC)
+% Convertir capítulos a mayúsculas automáticamente en el índice (TOC)
 \let\oldaddcontentsline\addcontentsline
 \renewcommand{\addcontentsline}[3]{%
-    \ifstrequal{#2}{section}%
+    \ifstrequal{#2}{chapter}%
         {\oldaddcontentsline{#1}{#2}{\MakeUppercase{#3}}}%
         {\oldaddcontentsline{#1}{#2}{#3}}%
 }

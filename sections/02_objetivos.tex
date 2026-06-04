@@ -1,12 +1,83 @@
-\section{Objetivos}
-\subsection{Objetivo general}
-Analizar mediante simulación electromagnética en ANSYS HFSS el comportamiento de un combinador de guía de onda WR42 operando a 20 GHz, evaluando su desempeño a partir de los parámetros de dispersión y la distribución del campo eléctrico dentro de la estructura.
-\subsection{Objetivos específicos}
-\begin{itemize}
-    \item Construir la geometría tridimensional del combinador de guía de onda a partir de las dimensiones establecidas para una estructura WR42.
-    \item Aplicar condiciones de frontera y excitaciones adecuadas que representen el comportamiento físico del dispositivo durante la simulación.
-    \item Configurar el análisis modal y el barrido de frecuencia necesario para obtener la respuesta electromagnética del combinador alrededor de la frecuencia de operación.
-    \item Obtener y analizar los parámetros S del sistema, especialmente los relacionados con reflexión, transmisión, aislamiento y combinación de potencia entre los puertos.
-    \item Visualizar la distribución del campo eléctrico dentro de la guía de onda para identificar las zonas de mayor concentración de energía y comprender el comportamiento de la unión combinadora.
-    \item Relacionar los resultados obtenidos en la simulación con el funcionamiento esperado de un combinador de potencia de baja pérdida en aplicaciones de microondas.
-\end{itemize}
+\chapter{MARCO TEORICO}
+
+\section{Gestión de residuos sólidos municipales}
+
+La gestión de residuos sólidos municipales comprende las actividades de generación, almacenamiento, recolección, transporte, tratamiento y disposición final de los residuos producidos en espacios urbanos. En zonas de alta actividad comercial y peatonal, como la manzana del Mercado San Camilo, la generación constante de residuos puede ocasionar que los contenedores alcancen su capacidad máxima antes de la recolección programada.
+
+La literatura sobre gestión inteligente de residuos señala que los sistemas basados en IoT permiten monitorear el estado de los contenedores, generar alertas y obtener datos históricos para apoyar la toma de decisiones en ciudades inteligentes \cite{sosunova2022smartwaste}. Asimismo, experiencias previas con redes LPWAN aplicadas a residuos urbanos han demostrado la utilidad de la conectividad de largo alcance para supervisar contenedores distribuidos en entornos urbanos \cite{cruz2021lorawanwaste}.
+
+\section{IoT aplicado al monitoreo urbano}
+
+El Internet de las Cosas, o IoT, permite conectar objetos físicos mediante sensores, microcontroladores, redes de comunicación y plataformas digitales. En aplicaciones urbanas, IoT se utiliza para monitorear infraestructura pública, condiciones ambientales, movilidad, energía y servicios municipales.
+
+En el caso del monitoreo de contenedores municipales, un sistema IoT permite medir variables como nivel de llenado, temperatura, humedad, gases y estado de batería. Estos datos pueden ser enviados hacia una plataforma de monitoreo para visualizar el estado de los contenedores y generar alertas ante condiciones críticas. Este enfoque permite pasar de una gestión basada en inspección visual o reportes manuales hacia una gestión apoyada en datos \cite{sosunova2022smartwaste,baldo2021multilayer}.
+
+\section{Tecnología LoRa y comunicación LoRa P2P}
+
+LoRa es una tecnología de comunicación inalámbrica de largo alcance y bajo consumo, orientada a aplicaciones IoT que transmiten pequeñas cantidades de datos. Su modulación se basa en espectro ensanchado por chirp, lo que permite mejorar la sensibilidad de recepción y la robustez frente al ruido \cite{semtech2015loramod}.
+
+Entre los parámetros principales de LoRa se encuentran el factor de dispersión o \textit{Spreading Factor} (SF), el ancho de banda (BW), la tasa de codificación (CR) y la potencia de transmisión. El incremento del SF puede mejorar el alcance y la sensibilidad, pero también aumenta el tiempo en aire del paquete, reduciendo la tasa de transmisión disponible \cite{ttn_spreading,ttn_modulation}.
+
+En el presente proyecto se utiliza comunicación LoRa P2P, es decir, una comunicación directa entre nodos IoT y un gateway propio. A diferencia de LoRaWAN, LoRa P2P no requiere un servidor de red LoRaWAN ni una infraestructura multicanal completa. Esto permite controlar directamente el formato de paquetes, los identificadores de nodo, los intervalos de transmisión y las métricas de evaluación de red.
+
+\section{Arquitectura del sistema propuesto}
+
+La arquitectura del sistema propuesto está compuesta por nodos IoT instalados en contenedores municipales, un gateway LoRa-WiFi, un servidor central y una plataforma de monitoreo. Los nodos se encargan de adquirir datos mediante sensores y transmitirlos mediante LoRa P2P hacia el gateway. Posteriormente, el gateway reenvía la información al servidor central mediante MQTT.
+
+El flujo general del sistema se representa de la siguiente manera:
+
+\begin{center}
+Nodo IoT $\rightarrow$ LoRa P2P $\rightarrow$ Gateway LoRa-WiFi $\rightarrow$ MQTT $\rightarrow$ Servidor central $\rightarrow$ Plataforma de monitoreo
+\end{center}
+
+Esta arquitectura permite evaluar tanto el estado de los contenedores municipales como el desempeño de la comunicación inalámbrica en un entorno urbano real.
+
+\section{Sensores y nodo IoT}
+
+El nodo IoT es el dispositivo encargado de adquirir y transmitir los datos del contenedor. En este proyecto se considera el uso de un microcontrolador ESP32, sensores de nivel de llenado, temperatura, humedad, gases y medición de batería. Además, se integra un módulo LoRa SX1278 para la transmisión de datos hacia el gateway en modo P2P.
+
+El uso de sensores permite convertir el estado físico del contenedor en datos digitales. Para fines de evaluación experimental, cada nodo debe incluir un identificador único y un número incremental de paquete, lo cual permite distinguir el origen de los datos y detectar posibles pérdidas durante la transmisión.
+
+\section{Gateway LoRa-WiFi}
+
+El gateway LoRa-WiFi cumple la función de intermediario entre los nodos IoT y el servidor central. Su tarea principal es recibir paquetes LoRa P2P, registrar métricas de comunicación como RSSI y SNR, validar la información recibida y reenviar los datos mediante MQTT.
+
+En el proyecto se propone emplear un ESP32-S3 como unidad principal del gateway, debido a su mayor capacidad de procesamiento frente a versiones básicas de ESP32. Sin embargo, al utilizar un módulo LoRa SX1278, el gateway no se comporta como un gateway LoRaWAN multicanal profesional. Por ello, resulta necesario controlar los intervalos de transmisión, el tamaño de los paquetes y la posibilidad de colisiones entre nodos.
+
+\section{MQTT, plataforma y bases de datos}
+
+MQTT es un protocolo de mensajería ligero basado en el modelo publicador/suscriptor. Es utilizado frecuentemente en aplicaciones IoT debido a su simplicidad, bajo consumo de ancho de banda y adecuación para dispositivos con recursos limitados \cite{oasis2019mqtt}.
+
+En el sistema propuesto, el gateway actúa como publicador MQTT y envía la telemetría hacia un broker Mosquitto. La plataforma de monitoreo utiliza una arquitectura compuesta por frontend en React, backend con Fastify, broker MQTT, PostgreSQL e InfluxDB. PostgreSQL se emplea para almacenar información estructurada como nodos, contenedores, gateways y configuración del sistema, mientras que InfluxDB se orienta al almacenamiento de datos temporales como nivel de llenado, RSSI, SNR, batería y latencia.
+
+\section{Métricas de red: RSSI, SNR, PDR, PLR y latencia}
+
+Para evaluar el desempeño de la red LoRa P2P se consideran métricas de comunicación que permiten medir la calidad y confiabilidad del enlace. El RSSI indica la intensidad de la señal recibida, mientras que el SNR representa la relación entre la señal útil y el ruido del canal. Estas métricas son utilizadas en estudios de redes LoRa y LoRaWAN para analizar cobertura y calidad de comunicación en entornos reales \cite{cruz2021lorawanwaste,baldo2021multilayer}.
+
+El \textit{Packet Delivery Ratio} (PDR) permite determinar el porcentaje de paquetes recibidos correctamente respecto al total de paquetes enviados:
+
+\[
+PDR = \frac{N_{recibidos}}{N_{enviados}} \times 100
+\]
+
+El \textit{Packet Loss Rate} (PLR) indica el porcentaje de paquetes perdidos:
+
+\[
+PLR = \frac{N_{enviados} - N_{recibidos}}{N_{enviados}} \times 100
+\]
+
+La latencia corresponde al tiempo transcurrido entre el envío de un paquete y su recepción o visualización en la plataforma. En el contexto de monitoreo de contenedores municipales, la latencia no requiere valores extremadamente bajos, pero debe ser suficiente para permitir alertas oportunas.
+
+\section{Airtime, colisiones y consumo energético}
+
+El airtime corresponde al tiempo durante el cual un paquete ocupa el canal de radio. En LoRa, este tiempo depende de parámetros como tamaño del payload, ancho de banda y factor de dispersión. Un mayor SF puede mejorar el alcance, pero también incrementa el tiempo en aire y el consumo energético \cite{ttn_spreading,ttn_modulation}.
+
+En una red LoRa P2P con varios nodos, pueden generarse colisiones si dos o más dispositivos transmiten simultáneamente hacia el gateway. Para reducir este riesgo, se pueden emplear estrategias como retardo aleatorio, paquetes compactos, ventanas de transmisión, identificador de nodo y número incremental de paquete.
+
+El consumo energético también es un aspecto importante, debido a que los nodos pueden operar con batería. Una frecuencia elevada de transmisión o sensores activos permanentemente pueden reducir la autonomía del sistema. Por ello, se considera necesario implementar intervalos de transmisión adecuados, activación selectiva de sensores y, si es posible, modos de bajo consumo.
+
+\section{Trabajos relacionados}
+
+Sosunova y Porras \cite{sosunova2022smartwaste} realizaron una revisión sistemática sobre sistemas IoT aplicados a la gestión inteligente de residuos, identificando tecnologías, aplicaciones y brechas de investigación en el área. Cruz et al. \cite{cruz2021lorawanwaste} presentaron una experiencia de uso de LoRaWAN para gestión urbana de residuos, evidenciando la utilidad de redes LPWAN para este tipo de aplicaciones. Por su parte, Baldo et al. \cite{baldo2021multilayer} propusieron una infraestructura LoRaWAN multicapa para gestión inteligente de residuos dentro del contexto de ciudades inteligentes.
+
+A diferencia de estos trabajos, el presente proyecto se enfoca en una red LoRa P2P con gateway propio, orientada al monitoreo de contenedores municipales en la manzana del Mercado San Camilo. Esta propuesta permite controlar directamente la comunicación nodo-gateway y evaluar experimentalmente métricas como RSSI, SNR, pérdida de paquetes, latencia, disponibilidad y consumo energético.
