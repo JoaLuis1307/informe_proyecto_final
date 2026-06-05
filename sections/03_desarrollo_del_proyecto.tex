@@ -182,13 +182,431 @@ En esta sección se describe la arquitectura general del sistema y la forma en q
 
 \subsection{Diagrama de bloques}
 
-El diagrama de bloques representa la estructura general del sistema y la relación entre sus principales componentes. De forma general, el sistema está compuesto por los nodos de monitoreo, el enlace LoRa P2P, el gateway, el servidor central y la plataforma de usuario.
+El diagrama de bloques representa la estructura general del sistema y la relación entre sus principales componentes. El sistema está conformado por los nodos de monitoreo, el gateway LoRa-WiFi, los servicios del servidor, las bases de datos y la plataforma web.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.96\textwidth}{!}{
+    \begin{tikzpicture}[
+        node distance=1.8cm,
+        bloque/.style={
+            rectangle,
+            rounded corners=3pt,
+            draw=black,
+            line width=0.8pt,
+            align=center,
+            text width=3.3cm,
+            minimum width=3.7cm,
+            minimum height=3cm,
+            inner sep=5pt,
+            fill=blue!7
+        },
+        flecha/.style={
+            -{Latex[length=3mm,width=2mm]},
+            line width=0.8pt
+        },
+        textoFlecha/.style={
+            font=\scriptsize,
+            align=center,
+            text width=1.7cm,
+            inner sep=0pt
+        }
+    ]
+
+    \node[bloque] (nodos) {
+        \textbf{Nodos IoT}\\[2mm]
+        ESP32 Dev Kit\\
+        Sensores del contenedor\\
+        Módulo LoRa SX1278\\
+        Alimentación por batería
+    };
+
+    \node[bloque, right=of nodos] (gateway) {
+        \textbf{Gateway LoRa-WiFi}\\[2mm]
+        ESP32-S3\\
+        Módulo LoRa SX1278\\
+        Registro de RSSI y SNR\\
+        Conectividad WiFi
+    };
+
+    \node[bloque, right=of gateway] (servicios) {
+        \textbf{Servicios del servidor}\\[2mm]
+        Mosquitto MQTT\\
+        API Fastify\\
+        Procesamiento de datos\\
+        Contenedores Docker
+    };
+
+    \node[bloque, right=of servicios] (datos) {
+        \textbf{Bases de datos}\\[2mm]
+        PostgreSQL\\
+        InfluxDB\\
+        Datos estructurados\\
+        Series temporales
+    };
+
+    \node[bloque, right=of datos] (plataforma) {
+        \textbf{Plataforma web}\\[2mm]
+        Frontend React\\
+        Estado de contenedores\\
+        Alertas e históricos\\
+        Métricas de red
+    };
+
+    \draw[flecha] (nodos) -- 
+        node[midway, above=2pt, textoFlecha] {LoRa P2P}
+        (gateway);
+
+    \draw[flecha] (gateway) -- 
+        node[midway, above=2pt, textoFlecha] {MQTT}
+        (servicios);
+
+    \draw[flecha] (servicios) -- 
+        node[midway, above=2pt, textoFlecha] {Consultas}
+        (datos);
+
+    \draw[flecha] (datos) -- 
+        node[midway, above=2pt, textoFlecha] {API REST}
+        (plataforma);
+
+    \end{tikzpicture}
+    }
+
+    \caption{Diagrama de bloques de la arquitectura general del sistema.}
+    \label{fig:diagrama_bloques_sistema}
+\end{figure}
+
+El flujo inicia en los nodos IoT, donde se adquieren los datos del contenedor. La información se transmite mediante LoRa P2P hacia el gateway, que posteriormente la publica mediante MQTT hacia el servidor. Los datos son procesados y almacenados en PostgreSQL e InfluxDB para su consulta y visualización en la plataforma web.
 
 \subsection{Diagrama de flujo}
 
-El diagrama de flujo describe la secuencia de funcionamiento del sistema, desde la adquisición de datos en el nodo IoT hasta la visualización de la información en la plataforma de monitoreo.
+El diagrama de flujo describe la secuencia de funcionamiento del sistema, desde la adquisición de datos en el nodo IoT hasta su almacenamiento y visualización en la plataforma web. La Figura~\ref{fig:flujo_funcionamiento_sistema} muestra las etapas de medición, transmisión, recepción, procesamiento y generación de alertas.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.48\textwidth}{!}{
+    \begin{tikzpicture}[
+        node distance=0.65cm,
+        proceso/.style={
+            rectangle,
+            rounded corners=3pt,
+            draw=black,
+            line width=0.8pt,
+            align=center,
+            text width=5.2cm,
+            minimum height=0.85cm,
+            fill=blue!7
+        },
+        decision/.style={
+            diamond,
+            draw=black,
+            line width=0.8pt,
+            align=center,
+            text width=3.2cm,
+            aspect=2.2,
+            inner sep=1pt,
+            fill=yellow!12
+        },
+        iniciofin/.style={
+            ellipse,
+            draw=black,
+            line width=0.8pt,
+            align=center,
+            text width=3.7cm,
+            minimum height=0.8cm,
+            fill=green!10
+        },
+        flecha/.style={
+            -{Latex[length=2.5mm]},
+            line width=0.8pt
+        },
+        texto/.style={
+            font=\scriptsize
+        }
+    ]
+
+    \node[iniciofin] (inicio) {
+        \textbf{Inicio del ciclo}
+    };
+
+    \node[proceso, below=of inicio] (lectura) {
+        \textbf{Lectura de sensores}\\
+        Nivel de llenado, temperatura, humedad, gases y batería
+    };
+
+    \node[proceso, below=of lectura] (procesamiento) {
+        \textbf{Procesamiento en el nodo IoT}\\
+        Validación y conversión de las mediciones
+    };
+
+    \node[decision, below=of procesamiento] (datosvalidos) {
+        ¿Datos válidos?
+    };
+
+    \node[proceso, right=1.8cm of datosvalidos] (relectura) {
+        Repetir lectura y verificar sensores
+    };
+
+    \node[proceso, below=of datosvalidos] (paquete) {
+        \textbf{Construcción del paquete}\\
+        ID de nodo, número de paquete, mediciones y estado
+    };
+
+    \node[proceso, below=of paquete] (transmision) {
+        \textbf{Transmisión LoRa P2P}\\
+        Envío del paquete hacia el gateway
+    };
+
+    \node[proceso, below=of transmision] (gateway) {
+        \textbf{Recepción en el gateway}\\
+        Validación del paquete y registro de RSSI y SNR
+    };
+
+    \node[decision, below=of gateway] (wifi) {
+        ¿Conexión WiFi disponible?
+    };
+
+    \node[proceso, right=1.8cm of wifi] (espera) {
+        Almacenar temporalmente y reintentar conexión
+    };
+
+    \node[proceso, below=of wifi] (mqtt) {
+        \textbf{Publicación mediante MQTT}\\
+        Envío de la telemetría hacia el servidor central
+    };
+
+    \node[proceso, below=of mqtt] (almacenamiento) {
+        \textbf{Procesamiento y almacenamiento}\\
+        API Fastify, PostgreSQL e InfluxDB
+    };
+
+    \node[decision, below=of almacenamiento] (critico) {
+        ¿Estado crítico?
+    };
+
+    \node[proceso, right=1.8cm of critico] (alerta) {
+        Generar alerta de llenado, gases o batería baja
+    };
+
+    \node[proceso, below=of critico] (visualizacion) {
+        \textbf{Visualización en la plataforma}\\
+        Contenedores, métricas de red, históricos y alertas
+    };
+
+    \node[iniciofin, below=of visualizacion] (esperaciclo) {
+        Esperar el siguiente intervalo de medición
+    };
+
+    \draw[flecha] (inicio) -- (lectura);
+    \draw[flecha] (lectura) -- (procesamiento);
+    \draw[flecha] (procesamiento) -- (datosvalidos);
+
+    \draw[flecha] (datosvalidos) --
+        node[right, texto]{Sí}
+        (paquete);
+
+    \draw[flecha] (datosvalidos) --
+        node[above, texto]{No}
+        (relectura);
+
+    \draw[flecha] (relectura) |- (lectura);
+
+    \draw[flecha] (paquete) -- (transmision);
+    \draw[flecha] (transmision) -- (gateway);
+    \draw[flecha] (gateway) -- (wifi);
+
+    \draw[flecha] (wifi) --
+        node[right, texto]{Sí}
+        (mqtt);
+
+    \draw[flecha] (wifi) --
+        node[above, texto]{No}
+        (espera);
+
+    \draw[flecha] (espera) |- (wifi);
+
+    \draw[flecha] (mqtt) -- (almacenamiento);
+    \draw[flecha] (almacenamiento) -- (critico);
+
+    \draw[flecha] (critico) --
+        node[right, texto]{No}
+        (visualizacion);
+
+    \draw[flecha] (critico) --
+        node[above, texto]{Sí}
+        (alerta);
+
+    \draw[flecha] (alerta) |- (visualizacion);
+    \draw[flecha] (visualizacion) -- (esperaciclo);
+    \draw[flecha] (esperaciclo.west) -- ++(-1.2,0) |- (lectura.west);
+
+    \end{tikzpicture}
+    }
+
+    \caption{Diagrama de flujo del funcionamiento general del sistema.}
+    \label{fig:flujo_funcionamiento_sistema}
+\end{figure}
+
+El flujo comienza con la lectura de los sensores instalados en el contenedor. El nodo valida las mediciones, construye un paquete de datos y lo transmite mediante LoRa P2P hacia el gateway. Este registra las métricas RSSI y SNR y publica la información mediante MQTT cuando dispone de conexión WiFi.
+
+Posteriormente, el servidor procesa y almacena los datos en PostgreSQL e InfluxDB. Si se detecta un nivel crítico de llenado, presencia elevada de gases o batería baja, el sistema genera una alerta. Finalmente, la información se presenta en la plataforma web y el nodo espera el siguiente intervalo para repetir el ciclo.
+
 
 \subsection{Arquitectura de comunicación LoRa P2P}
+
+La arquitectura de comunicación propuesta utiliza una topología tipo estrella, en la cual varios nodos IoT transmiten directamente hacia un gateway LoRa-WiFi mediante enlaces LoRa P2P. Cada nodo dispone de un identificador único y genera paquetes que contienen las mediciones del contenedor, el número secuencial del paquete y el estado energético del dispositivo.
+Todos los nodos deben utilizar parámetros de radio compatibles, como frecuencia de operación, ancho de banda, factor de dispersión, tasa de codificación y potencia de transmisión. El gateway permanece en modo recepción, identifica el origen de cada paquete y registra métricas como RSSI y SNR. Posteriormente, la información es reenviada hacia el servidor central mediante MQTT.
+
+La Figura~\ref{fig:arquitectura_lora_p2p} presenta la arquitectura de comunicación implementada.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.94\textwidth}{!}{
+    \begin{tikzpicture}[
+        node distance=1.15cm and 3.6cm,
+        nodo/.style={
+            rectangle,
+            rounded corners=3pt,
+            draw=black,
+            line width=0.8pt,
+            align=center,
+            text width=3.6cm,
+            minimum height=1.55cm,
+            fill=blue!7
+        },
+        gateway/.style={
+            rectangle,
+            rounded corners=3pt,
+            draw=black,
+            line width=0.9pt,
+            align=center,
+            text width=4.2cm,
+            minimum height=3.1cm,
+            fill=green!10
+        },
+        servidor/.style={
+            rectangle,
+            rounded corners=3pt,
+            draw=black,
+            line width=0.8pt,
+            align=center,
+            text width=3.8cm,
+            minimum height=2.2cm,
+            fill=violet!8
+        },
+        flecha/.style={
+            -{Latex[length=2.8mm,width=1.8mm]},
+            line width=0.8pt
+        },
+        retorno/.style={
+            {Latex[length=2.4mm,width=1.6mm]}-,
+            dashed,
+            line width=0.7pt
+        },
+        etiqueta/.style={
+            font=\scriptsize,
+            inner sep=1pt
+        }
+    ]
+
+    % Nodos
+    \node[nodo] (nodo1) {
+        \textbf{Nodo IoT 1}\\
+        ID: N01\\
+        Sensores + ESP32 + SX1278
+    };
+
+    \node[nodo, below=of nodo1] (nodo2) {
+        \textbf{Nodo IoT 2}\\
+        ID: N02\\
+        Sensores + ESP32 + SX1278
+    };
+
+    \node[nodo, below=of nodo2] (nodon) {
+        \textbf{Nodo IoT N}\\
+        ID: N\ldots\\
+        Sensores + ESP32 + SX1278
+    };
+
+    % Gateway
+    \node[gateway, right=of nodo2] (gateway) {
+        \textbf{Gateway LoRa-WiFi}\\[1mm]
+        ESP32-S3 + SX1278\\
+        Recepción de paquetes\\
+        Identificación del nodo\\
+        Registro de RSSI y SNR\\
+        Publicación mediante MQTT
+    };
+
+    % Servidor
+    \node[servidor, right=3.5cm of gateway] (servidor) {
+        \textbf{Servidor central}\\[1mm]
+        Broker MQTT\\
+        API y bases de datos\\
+        Plataforma de monitoreo
+    };
+
+    % Enlaces LoRa
+    \draw[flecha]
+        (nodo1.east) --
+        node[above, etiqueta]{LoRa P2P}
+        (gateway.west |- nodo1.east);
+
+    \draw[flecha]
+        (nodo2.east) --
+        node[above, etiqueta]{LoRa P2P}
+        (gateway.west);
+
+    \draw[flecha]
+        (nodon.east) --
+        node[above, etiqueta]{LoRa P2P}
+        (gateway.west |- nodon.east);
+
+    % Enlace IP
+    \draw[flecha]
+        (gateway.east) --
+        node[above, etiqueta]{WiFi / MQTT}
+        (servidor.west);
+
+    % Retorno opcional de configuración
+    \draw[retorno]
+        ([yshift=-5mm]gateway.east) --
+        node[below, etiqueta]{Configuración o confirmación opcional}
+        ([yshift=-5mm]servidor.west);
+
+    \end{tikzpicture}
+    }
+
+    \caption{Arquitectura de comunicación LoRa P2P entre nodos, gateway y servidor central.}
+    \label{fig:arquitectura_lora_p2p}
+\end{figure}
+
+La comunicación se realiza principalmente en sentido ascendente, desde los nodos hacia el gateway. Para diferenciar las transmisiones, cada paquete incorpora un identificador de nodo y un número secuencial. Estos campos permiten detectar paquetes duplicados, estimar pérdidas y calcular métricas como PDR y PLR.
+
+Con el fin de reducir transmisiones simultáneas, la arquitectura puede incorporar intervalos diferenciados, retardos aleatorios y transmisión por eventos. Las confirmaciones o mensajes descendentes deben utilizarse únicamente cuando sean necesarios, debido a que incrementan el tiempo en aire y el consumo energético.
+
+\begin{table}[H]
+\centering
+\caption{Características de la arquitectura LoRa P2P propuesta.}
+\label{tab:arquitectura_lora_p2p}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\linewidth}{
+>{\raggedright\arraybackslash}p{4.2cm}
+>{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Característica} & \textbf{Descripción} \\
+\midrule
+Topología & Estrella, con varios nodos asociados a un gateway. \\
+Modo de comunicación & LoRa punto a punto, sin servidor de red LoRaWAN. \\
+Identificación & Identificador único de nodo y número secuencial de paquete. \\
+Parámetros compartidos & Frecuencia, ancho de banda, factor de dispersión, tasa de codificación y potencia de transmisión. \\
+Métricas registradas & RSSI, SNR, paquetes enviados, paquetes recibidos, PDR, PLR y latencia. \\
+Control de acceso & Intervalos de transmisión, retardo aleatorio y transmisión por evento. \\
+Salida del gateway & Publicación de telemetría hacia el servidor mediante MQTT. \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 La comunicación entre los nodos y el gateway se realiza mediante LoRa P2P. En este esquema, cada nodo transmite paquetes de datos hacia un gateway propio, sin utilizar una infraestructura LoRaWAN.
 
@@ -205,14 +623,182 @@ Para esta arquitectura se consideran los siguientes elementos:
 
 \subsection{Flujo de datos del sistema}
 
-El flujo general de datos del sistema se define de la siguiente manera:
+El flujo de datos del sistema comienza con la adquisición de las variables físicas del contenedor y finaliza con su almacenamiento y visualización en la plataforma web. Durante este proceso, la información es validada, empaquetada, transmitida, procesada y registrada junto con las métricas de comunicación obtenidas por el gateway.El proceso comienza con la lectura de los sensores instalados en el contenedor. El ESP32 valida y procesa las mediciones antes de construir un paquete compacto que incluye el identificador del nodo, el número secuencial, las variables medidas y el estado energético.
 
-\begin{center}
-Nodo IoT $\rightarrow$ LoRa P2P $\rightarrow$ Gateway LoRa-WiFi $\rightarrow$ MQTT $\rightarrow$ Servidor central $\rightarrow$ Plataforma web
-\end{center}
+El paquete se transmite mediante LoRa P2P hacia el gateway. Al recibirlo, el gateway incorpora información adicional del enlace, como RSSI, SNR y la marca temporal, y posteriormente publica la telemetría mediante MQTT hacia el servidor central.
+La Figura~\ref{fig:flujo_datos_sistema} presenta el recorrido de la información entre los diferentes componentes del sistema.En el servidor, la API desarrollada con Fastify valida y clasifica la información. Los datos estructurados, como nodos, contenedores y configuración, se almacenan en PostgreSQL, mientras que las mediciones y métricas temporales se registran en InfluxDB. Finalmente, la plataforma desarrollada en React consulta estos datos para mostrar el estado de los contenedores, alertas, históricos y métricas de la red LoRa P2P.
+\begin{figure}[H]
+    \centering
+    \resizebox{0.38\textwidth}{!}{
+    \begin{tikzpicture}[
+        node distance=0.75cm,
+        bloque/.style={
+            rectangle,
+            rounded corners=3pt,
+            draw=black,
+            line width=0.8pt,
+            align=center,
+            text width=6.0cm,
+            minimum height=1.05cm,
+            inner sep=5pt,
+            fill=blue!7
+        },
+        almacenamiento/.style={
+            rectangle,
+            rounded corners=3pt,
+            draw=black,
+            line width=0.8pt,
+            align=center,
+            text width=6.0cm,
+            minimum height=1.05cm,
+            inner sep=5pt,
+            fill=green!9
+        },
+        interfaz/.style={
+            rectangle,
+            rounded corners=3pt,
+            draw=black,
+            line width=0.8pt,
+            align=center,
+            text width=6.0cm,
+            minimum height=1.05cm,
+            inner sep=5pt,
+            fill=violet!8
+        },
+        flecha/.style={
+            -{Latex[length=2.6mm,width=1.8mm]},
+            line width=0.8pt
+        },
+        etiqueta/.style={
+            font=\scriptsize,
+            fill=white,
+            inner sep=1pt
+        }
+    ]
 
-Este flujo permite que los datos adquiridos por los sensores sean transmitidos, recibidos, almacenados y visualizados en la plataforma de monitoreo.
+    \node[bloque] (sensores) {
+        \textbf{1. Adquisición de datos}\\
+        Nivel de llenado, temperatura, humedad, gases y batería
+    };
 
+    \node[bloque, below=of sensores] (nodo) {
+        \textbf{2. Procesamiento en el nodo IoT}\\
+        Validación, conversión de mediciones y determinación del estado del contenedor
+    };
+
+    \node[bloque, below=of nodo] (paquete) {
+        \textbf{3. Construcción del paquete LoRa}\\
+        ID del nodo, número de paquete, mediciones, batería y estado
+    };
+
+    \node[bloque, below=of paquete] (lora) {
+        \textbf{4. Transmisión LoRa P2P}\\
+        Envío inalámbrico del paquete hacia el gateway
+    };
+
+    \node[bloque, below=of lora] (gateway) {
+        \textbf{5. Procesamiento en el gateway}\\
+        Validación del paquete, registro de RSSI, SNR y marca temporal
+    };
+
+    \node[bloque, below=of gateway] (mqtt) {
+        \textbf{6. Publicación mediante MQTT}\\
+        Envío de telemetría hacia el broker Mosquitto del servidor central
+    };
+
+    \node[bloque, below=of mqtt] (backend) {
+        \textbf{7. Procesamiento en el backend}\\
+        Validación, clasificación de datos y generación de alertas
+    };
+
+    \node[almacenamiento, below=of backend] (bases) {
+        \textbf{8. Almacenamiento}\\
+        PostgreSQL para datos estructurados e InfluxDB para series temporales
+    };
+
+    \node[interfaz, below=of bases] (plataforma) {
+        \textbf{9. Visualización en la plataforma web}\\
+        Estado de contenedores, métricas de red, alertas e históricos
+    };
+
+    \draw[flecha] (sensores.south) --
+        node[right, etiqueta]{Lecturas}
+        (nodo.north);
+
+    \draw[flecha] (nodo.south) --
+        node[right, etiqueta]{Datos procesados}
+        (paquete.north);
+
+    \draw[flecha] (paquete.south) --
+        node[right, etiqueta]{Payload}
+        (lora.north);
+
+    \draw[flecha] (lora.south) --
+        node[right, etiqueta]{Paquete LoRa}
+        (gateway.north);
+
+    \draw[flecha] (gateway.south) --
+        node[right, etiqueta]{Telemetría enriquecida}
+        (mqtt.north);
+
+    \draw[flecha] (mqtt.south) --
+        node[right, etiqueta]{Mensaje MQTT}
+        (backend.north);
+
+    \draw[flecha] (backend.south) --
+        node[right, etiqueta]{Datos validados}
+        (bases.north);
+
+    \draw[flecha] (bases.south) --
+        node[right, etiqueta]{Consultas}
+        (plataforma.north);
+
+    \end{tikzpicture}
+    }
+
+    \caption{Flujo de datos del sistema de monitoreo.}
+    \label{fig:flujo_datos_sistema}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Datos procesados en cada etapa del sistema.}
+\label{tab:flujo_datos_sistema}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\linewidth}{
+>{\raggedright\arraybackslash}p{3.5cm}
+>{\raggedright\arraybackslash}X
+>{\raggedright\arraybackslash}p{3.6cm}}
+\toprule
+\textbf{Etapa} & \textbf{Datos procesados} & \textbf{Destino} \\
+\midrule
+Sensores
+& Nivel de llenado, temperatura, humedad, gases y batería.
+& ESP32 del nodo. \\
+
+Nodo IoT
+& Datos validados, ID de nodo, número de paquete y estado del contenedor.
+& Módulo LoRa SX1278. \\
+
+Comunicación LoRa P2P
+& Paquete compacto de telemetría.
+& Gateway LoRa-WiFi. \\
+
+Gateway
+& Telemetría, RSSI, SNR y marca temporal.
+& Broker MQTT. \\
+
+Backend
+& Datos validados, eventos y alertas.
+& PostgreSQL e InfluxDB. \\
+
+Plataforma web
+& Estado actual, históricos y métricas de comunicación.
+& Usuario del sistema. \\
+\bottomrule
+\end{tabularx}
+\end{table}
 \section{Prototipado del sistema}
 
 En esta sección se describe la construcción física del prototipo, incluyendo el montaje del nodo IoT, el montaje del gateway y la configuración inicial de los dispositivos.
