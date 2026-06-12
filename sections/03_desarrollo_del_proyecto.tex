@@ -456,129 +456,11 @@ Posteriormente, el servidor procesa y almacena los datos en PostgreSQL e InfluxD
 
 La arquitectura de comunicación propuesta utiliza una topología tipo estrella, en la cual varios nodos IoT transmiten directamente hacia un gateway LoRa-WiFi mediante enlaces LoRa P2P. Cada nodo dispone de un identificador único y genera paquetes que contienen las mediciones del contenedor, el número secuencial del paquete y el estado energético del dispositivo.
 Todos los nodos deben utilizar parámetros de radio compatibles, como frecuencia de operación, ancho de banda, factor de dispersión, tasa de codificación y potencia de transmisión. El gateway permanece en modo recepción, identifica el origen de cada paquete y registra métricas como RSSI y SNR. Posteriormente, la información es reenviada hacia el servidor central mediante MQTT.
-
-La Figura~\ref{fig:arquitectura_lora_p2p} presenta la arquitectura de comunicación implementada.
-
 \begin{figure}[H]
     \centering
-    \resizebox{0.94\textwidth}{!}{
-    \begin{tikzpicture}[
-        node distance=1.15cm and 3.6cm,
-        nodo/.style={
-            rectangle,
-            rounded corners=3pt,
-            draw=black,
-            line width=0.8pt,
-            align=center,
-            text width=3.6cm,
-            minimum height=1.55cm,
-            fill=blue!7
-        },
-        gateway/.style={
-            rectangle,
-            rounded corners=3pt,
-            draw=black,
-            line width=0.9pt,
-            align=center,
-            text width=4.2cm,
-            minimum height=3.1cm,
-            fill=green!10
-        },
-        servidor/.style={
-            rectangle,
-            rounded corners=3pt,
-            draw=black,
-            line width=0.8pt,
-            align=center,
-            text width=3.8cm,
-            minimum height=2.2cm,
-            fill=violet!8
-        },
-        flecha/.style={
-            -{Latex[length=2.8mm,width=1.8mm]},
-            line width=0.8pt
-        },
-        retorno/.style={
-            {Latex[length=2.4mm,width=1.6mm]}-,
-            dashed,
-            line width=0.7pt
-        },
-        etiqueta/.style={
-            font=\scriptsize,
-            inner sep=1pt
-        }
-    ]
-
-    % Nodos
-    \node[nodo] (nodo1) {
-        \textbf{Nodo IoT 1}\\
-        ID: N01\\
-        Sensores + ESP32 + SX1278
-    };
-
-    \node[nodo, below=of nodo1] (nodo2) {
-        \textbf{Nodo IoT 2}\\
-        ID: N02\\
-        Sensores + ESP32 + SX1278
-    };
-
-    \node[nodo, below=of nodo2] (nodon) {
-        \textbf{Nodo IoT N}\\
-        ID: N\ldots\\
-        Sensores + ESP32 + SX1278
-    };
-
-    % Gateway
-    \node[gateway, right=of nodo2] (gateway) {
-        \textbf{Gateway LoRa-WiFi}\\[1mm]
-        ESP32-S3 + SX1278\\
-        Recepción de paquetes\\
-        Identificación del nodo\\
-        Registro de RSSI y SNR\\
-        Publicación mediante MQTT
-    };
-
-    % Servidor
-    \node[servidor, right=3.5cm of gateway] (servidor) {
-        \textbf{Servidor central}\\[1mm]
-        Broker MQTT\\
-        API y bases de datos\\
-        Plataforma de monitoreo
-    };
-
-    % Enlaces LoRa
-    \draw[flecha]
-        (nodo1.east) --
-        node[above, etiqueta]{LoRa P2P}
-        (gateway.west |- nodo1.east);
-
-    \draw[flecha]
-        (nodo2.east) --
-        node[above, etiqueta]{LoRa P2P}
-        (gateway.west);
-
-    \draw[flecha]
-        (nodon.east) --
-        node[above, etiqueta]{LoRa P2P}
-        (gateway.west |- nodon.east);
-
-    % Enlace IP
-    \draw[flecha]
-        (gateway.east) --
-        node[above, etiqueta]{WiFi / MQTT}
-        (servidor.west);
-
-    % Retorno opcional de configuración
-    \draw[retorno]
-        ([yshift=-5mm]gateway.east) --
-        node[below, etiqueta]{Configuración o confirmación opcional}
-        ([yshift=-5mm]servidor.west);
-
-    \end{tikzpicture}
-    }
-
-    \caption{Arquitectura de comunicación LoRa P2P entre nodos, gateway y servidor central.}
-    \label{fig:arquitectura_lora_p2p}
+    \includegraphics[width=0.85\textwidth]{figures/red.pdf}
+    \caption{Diseño de la red de comunicación del sistema.}
+    \label{fig:diseno_red}
 \end{figure}
 
 La comunicación se realiza principalmente en sentido ascendente, desde los nodos hacia el gateway. Para diferenciar las transmisiones, cada paquete incorpora un identificador de nodo y un número secuencial. Estos campos permiten detectar paquetes duplicados, estimar pérdidas y calcular métricas como PDR y PLR.
@@ -629,7 +511,7 @@ El paquete se transmite mediante LoRa P2P hacia el gateway. Al recibirlo, el gat
 La Figura~\ref{fig:flujo_datos_sistema} presenta el recorrido de la información entre los diferentes componentes del sistema.En el servidor, la API desarrollada con Fastify valida y clasifica la información. Los datos estructurados, como nodos, contenedores y configuración, se almacenan en PostgreSQL, mientras que las mediciones y métricas temporales se registran en InfluxDB. Finalmente, la plataforma desarrollada en React consulta estos datos para mostrar el estado de los contenedores, alertas, históricos y métricas de la red LoRa P2P.
 \begin{figure}[H]
     \centering
-    \resizebox{0.38\textwidth}{!}{
+    \resizebox{0.28\textwidth}{!}{
     \begin{tikzpicture}[
         node distance=0.75cm,
         bloque/.style={
